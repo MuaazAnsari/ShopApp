@@ -1,5 +1,4 @@
-//Array to store products obtained from req.body
-const products = []
+const Product = require('../models/product');
 
 // Taken from admin.js file
 exports.getAddProduct = (req,res,next) => {
@@ -7,11 +6,15 @@ exports.getAddProduct = (req,res,next) => {
 };
 
 exports.postAddProduct = (req,res,next) =>{
-    products.push({title : req.body.title});
+    //creating object of the class and passing the title to it and saving it.
+    const product = new Product(req.body.title);
+    product.save();
     res.redirect('/');
 };
 
 // Taken From shop.js File
 exports.getProducts = (req,res,next) =>{
+    // Fetching all products using FetchAll method of class and passing as argument in render.
+    const products = Product.fetchAll();
     res.render('shop', {prods: products, pageTitle:'Shop', path: '/'});
 };
