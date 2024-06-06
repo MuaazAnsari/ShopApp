@@ -10,7 +10,7 @@ const shopRoutes = require('./routes/shop')
 
 const app = express();
 
-app.set('view engine', 'pug');
+app.set('view engine', 'ejs');
 //if the views folder is named something else then else the below line is not required as it is built in name is views.
 app.set('views', 'views')
 
