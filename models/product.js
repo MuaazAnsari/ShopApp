@@ -6,8 +6,11 @@ const rootDir = require("../util/path");
 const p = path.join(rootDir, "data", "products.json");
 
 module.exports = class Product {
-  constructor(title) {
+  constructor(title, imageUrl, description, price) {
     this.title = title;
+    this.imageUrl = imageUrl;
+    this.description = description;
+    this.price = price;
   }
 
   save() {
@@ -16,6 +19,7 @@ module.exports = class Product {
         let products = [];
         //if no error, ie there is some data in JSON file. Then retreive the JSON format and convert it to array or object.
         if(!err){
+          console.log('Hi')
             products = JSON.parse(fileContent);
         }
         //push current object to the array.
