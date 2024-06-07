@@ -2,7 +2,7 @@ const Product = require('../models/product');
 
 // Taken from admin.js file
 exports.getAddProduct = (req,res,next) => {
-    res.render('add-product', {pageTitle: 'Add Product', path : '/admin/add-product'});
+    res.render('admin/add-product', {pageTitle: 'Add Product', path : '/admin/add-product'});
 };
 
 exports.postAddProduct = (req,res,next) =>{
@@ -16,7 +16,7 @@ exports.postAddProduct = (req,res,next) =>{
 exports.getProducts = (req,res,next) =>{
     // Fetching all products using FetchAll method of class and passing as argument in render.
     const products = Product.fetchAll((products) =>{
-        res.render('shop', {prods: products, pageTitle:'Shop', path: '/'});
+        res.render('shop/product-list', {prods: products, pageTitle:'Shop', path: '/'});
     });
     
 };
