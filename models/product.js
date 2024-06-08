@@ -14,6 +14,8 @@ module.exports = class Product {
   }
 
   save() {
+    //adding unique id to the product
+    this.id = Math.random().toString();
     fs.readFile(p, (err,fileContent) => {
         //initialise empty array
         let products = [];
@@ -38,6 +40,14 @@ module.exports = class Product {
             cb([]);
         }
         cb(JSON.parse(fileContent));
+    });
+}
+
+// function to find product by id to get its details.
+static findById(id, cb){
+    this.fetchAll(products => {
+      const product = products.find(p => p.id === id);
+      cb(product);
     });
 }
 

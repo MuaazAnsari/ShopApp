@@ -17,6 +17,16 @@ exports.getProducts = (req,res,next) =>{
     
 };
 
+// To extract single product details using id
+
+exports.getProduct = (req,res,next) =>{
+    const prodId = req.params.productId;
+    Product.findById(prodId, product => {
+        res.render('shop/product-details', {product : product , pageTitle:'Product Details', path:'/products'});
+    })
+    
+}
+
 exports.getCart = (req,res,next) =>{
     res.render('shop/cart', {pageTitle : 'My Cart', path:'/cart'});
 };
