@@ -12,9 +12,11 @@
             </div>
             <h2>$<%= product.price %></h2>
             <p> <%= product.description %></p>
-            <form action="/cart" method="POST">
-                <button class="btn"> Add to Cart</button>
-            </form>
+
+            <!-- Since the include file dont have access to product object, we need to pass a new object 
+            as argument which takes a New key which is used to access it in include file. -->
+            <%- include('../includes/add-to-cart.ejs', {product : product}) %>
+            
         </main>
 
 <%- include('../includes/end.ejs') %>
