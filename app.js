@@ -11,9 +11,12 @@ const app = express();
 
 const errorControllers = require('./controllers/error');
 
+const db = require('./util/db')
+
 app.set('view engine', 'ejs');
 //if the views folder is named something else then else the below line is not required as it is built in name is views.
 app.set('views', 'views')
+
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(path.join(__dirname, 'public')))
