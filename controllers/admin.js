@@ -24,6 +24,7 @@ exports.postAddProduct = (req, res, next) => {
   .then(() => {
     // console.log(result);
     console.log('Inserted Product');
+    res.redirect("/admin/products");
   })
   .catch(err => console.log(err)); 
 };
@@ -79,8 +80,16 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.deleteProduct = (req,res,next) =>{
   const prodId = req.body.productId;
-  Product.deleteById(prodId);
-  res.redirect('/admin/products');
+  Product.findByPk(prodId)
+  .then((product) => {
+    // destroy function deletes product. It returns a promise, so we are returning it to next .then block. 
+    return product.destroy();
+  })
+  .then(result => {
+    console.log(result);
+    res.redirect('/admin/products');
+  })
+  .catch(err => console.log(err))
 };
 
 exports.getProducts = (req, res, next) => {
