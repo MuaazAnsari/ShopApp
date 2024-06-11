@@ -38,7 +38,7 @@ exports.getProduct = (req, res, next) => {
   //utilising the function provided by sequelize
   Product.findByPk(prodId)
     .then((product) => {
-      console.log(product);
+      // console.log(product);
       res.render("shop/product-details", {
         product: product,
         pageTitle: "Product Details",
