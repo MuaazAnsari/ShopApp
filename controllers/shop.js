@@ -3,48 +3,49 @@ const Cart = require("../models/cart");
 const path = require("../util/path");
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
-  .then(([rows, metaData]) => {  
-    // Here rows is an array of object which contains the object values such as [{id : 1}] etc.
-    // fieldData contains the meta data information such as Data type , primary key etc. 
-    res.render("shop/index", { prods: rows, pageTitle: "Shop", path: "/" });
-  })
-  .catch((err) => {
-    console.log(err);
-  })
+  Product.findAll()
+    .then((products) => {
+      res.render("shop/index", {
+        prods: products,
+        pageTitle: "Shop",
+        path: "/",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 // Taken From shop.js File
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
-  .then(([rows, metaData]) => {
-    res.render("shop/product-list", {
-      prods: rows,
-      pageTitle: "All Products",
-      path: "/products",
-  })
-  })
-  .catch(() => {
-    console.log(err);
-  });
-  
+  Product.findAll()
+    .then((products) => {
+      res.render("shop/product-list", {
+        prods: products,
+        pageTitle: "All Products",
+        path: "/products",
+      });
+    })
+    .catch(() => {
+      console.log(err);
+    });
 };
 
 // To extract single product details using id
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  Product.findById(prodId)
-  .then(([product]) => {
-    console.log(product);
-    res.render("shop/product-details", {
-      product: product[0],
-      pageTitle: "Product Details",
-      path: "/products",
-  })
-
-})
-  .catch(err => console.log(err));
+  //utilising the function provided by sequelize
+  Product.findByPk(prodId)
+    .then((product) => {
+      console.log(product);
+      res.render("shop/product-details", {
+        product: product,
+        pageTitle: "Product Details",
+        path: "/products",
+      });
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.getCart = (req, res, next) => {
@@ -82,15 +83,14 @@ exports.postCart = (req, res, next) => {
   res.redirect("/cart");
 };
 
-exports.deleteProductCart = (req,res,next) =>{
+exports.deleteProductCart = (req, res, next) => {
   const prodId = req.body.productId;
 
-  Product.findById(prodId, product => {
+  Product.findById(prodId, (product) => {
     Cart.deleteProduct(prodId, product.price);
-    res.redirect('/cart');
-  })
+    res.redirect("/cart");
+  });
 };
-
 
 exports.getCheckout = (req, res, next) => {
   res.render("res/checkout", { pageTitle: "Checkout", path: "/checkout" });
