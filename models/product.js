@@ -1,31 +1,37 @@
-const Cart = require("./cart");
-const db = require("../util/db");
+// importing the Sequelize class 
+const Sequelize = require('sequelize');
 
-module.exports = class Product {
-  constructor(id, title, imageUrl, description, price) {
-    this.id = id;
-    this.title = title;
-    this.imageUrl = imageUrl;
-    this.description = description;
-    this.price = price;
+// importing the database connection pool and more from the db.js file
+const sequelize = require('../util/db');
+
+const Product = sequelize.define('product',{
+  id: {
+    type : Sequelize.INTEGER,
+    autoIncrement : true,
+    allowNull : false,
+    primaryKey : true
+  },
+
+  title:{
+    type : Sequelize.STRING,
+    allowNull:false
+  },
+
+  price : {
+    type : Sequelize.DOUBLE,
+    allowNull:false
+  },
+
+  description : {
+    type : Sequelize.STRING,
+    allowNull:false
+  },
+
+  imageUrl : {
+    type : Sequelize.STRING,
+    allowNull:false
   }
 
-  save() {
-    return db.execute(
-      'INSERT into products (title,price,description,imageUrl) VALUES (?, ?, ?, ?)' 
-      , [this.title, this.price, this.description, this.imageUrl]
-    );
-  }
+});
 
-  static fetchAll() {
-    //db.execute returns a promise ie if it is successful, execute then(), if it fails execute catch()
-    // Here we are returning the promise so we can use the two functions somewhere else.
-    return db.execute("SELECT * FROM products");
-  }
-
-  static findById(id) {
-    return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
-  }
-
-  static deleteById(prodId) {}
-};
+module.exports = Product;

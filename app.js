@@ -11,7 +11,7 @@ const app = express();
 
 const errorControllers = require('./controllers/error');
 
-const db = require('./util/db')
+const sequelize = require('./util/db')
 
 app.set('view engine', 'ejs');
 //if the views folder is named something else then else the below line is not required as it is built in name is views.
@@ -27,5 +27,9 @@ app.use(shopRoutes);
 
 app.use(errorControllers.get404);
 
-
-app.listen(3000);
+sequelize.sync()
+.then(result => {
+    // console.log(result);
+    app.listen(3000);
+})
+.catch((err) => console.log(err));
