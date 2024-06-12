@@ -1,6 +1,4 @@
 const Product = require("../models/product");
-const Cart = require("../models/cart");
-const path = require("../util/path");
 
 exports.getIndex = (req, res, next) => {
   Product.findAll()
@@ -130,6 +128,33 @@ exports.deleteProductCart = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   res.render("shop/orders", { pageTitle: "My Orders", path: "/orders" });
 };
+
+exports.postOrders = (req,res,next) => {
+  let fetchedCart;
+  req.user.getCart()
+  .then(cart => {
+    fetchedCart = cart;
+    return cart.getProducts()
+  })
+  .then(products => {
+    return req.user.createOrder()
+    .then(order => {
+      order.addProducts(products.map(product => {
+          product.orderItem = {quantity : product.cartItem.quantity};
+          return product;
+      }));
+    })
+    .catch(err => console.log(err))
+  })
+  .then(() => {
+    // we are emptying the cart after adding the elements in the order.
+    return fetchedCart.setProducts(null);
+    })
+    .then(result => {
+      res.redirect('/orders');
+  })
+  .catch(err => console.log(err))
+}
 
 exports.getCheckout = (req, res, next) => {
   res.render("res/checkout", { pageTitle: "Checkout", path: "/checkout" });
