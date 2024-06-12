@@ -104,58 +104,67 @@ exports.postCart = (req, res, next) => {
 
 exports.deleteProductCart = (req, res, next) => {
   const prodId = req.body.productId;
-  req.user.getCart()
-  .then(cart => {
-    return cart.getProducts({where: { id : prodId}})
-  })
-  .then(products => {
-    let product = products[0];
-    return product;
-  })
-  .then((product) => {
-    // This removes product object from cart only not from the database
-    return product.cartItem.destroy();
-  })
+  req.user
+    .getCart()
+    .then((cart) => {
+      return cart.getProducts({ where: { id: prodId } });
+    })
+    .then((products) => {
+      let product = products[0];
+      return product;
+    })
+    .then((product) => {
+      // This removes product object from cart only not from the database
+      return product.cartItem.destroy();
+    })
 
-  .then(() => {
-    console.log("DELETED PRODUCT");
-    res.redirect('/cart');
-  })
-  .catch(err => console.log(err))
+    .then(() => {
+      console.log("DELETED PRODUCT");
+      res.redirect("/cart");
+    })
+    .catch((err) => console.log(err));
 };
-
 
 exports.getOrders = (req, res, next) => {
-  res.render("shop/orders", { pageTitle: "My Orders", path: "/orders" });
-};
-
-exports.postOrders = (req,res,next) => {
-  let fetchedCart;
-  req.user.getCart()
-  .then(cart => {
-    fetchedCart = cart;
-    return cart.getProducts()
-  })
-  .then(products => {
-    return req.user.createOrder()
-    .then(order => {
-      order.addProducts(products.map(product => {
-          product.orderItem = {quantity : product.cartItem.quantity};
-          return product;
-      }));
-    })
-    .catch(err => console.log(err))
-  })
-  .then(() => {
-    // we are emptying the cart after adding the elements in the order.
-    return fetchedCart.setProducts(null);
-    })
-    .then(result => {
-      res.redirect('/orders');
+  req.user.getOrders({include : ['products']})
+  .then(orders => {
+    console.log(orders);
+    res.render("shop/orders", {
+      pageTitle: "My Orders",
+      path: "/orders",
+      orders: orders,
+    });
   })
   .catch(err => console.log(err))
-}
+};
 
-exports.getCheckout = (req, res, next) => {
-  res.render("res/checkout", { pageTitle: "Checkout", path: "/checkout" });
+exports.postOrders = (req, res, next) => {
+  let fetchedCart;
+  req.user
+    .getCart()
+    .then((cart) => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
+    .then((products) => {
+      return req.user
+        .createOrder()
+        .then((order) => {
+          order.addProducts(
+            products.map((product) => {
+              product.orderItem = { quantity: product.cartItem.quantity };
+              return product;
+            })
+          );
+        })
+        .catch((err) => console.log(err));
+    })
+    .then(() => {
+      // we are emptying the cart after adding the elements in the order.
+      return fetchedCart.setProducts(null);
+    })
+    .then((result) => {
+      res.redirect("/orders");
+    })
+    .catch((err) => console.log(err));
 };
