@@ -24,6 +24,7 @@
                         <div class="card__actions">
                             <!-- Since the include file dont have access to product object, we need to pass a new object 
                             as argument which takes a New key which is used to access it in include file. -->
+                            <a href="/products/<%= product._id %>" class="btn"> Details</a>
                             <%- include('../includes/add-to-cart.ejs', {product : product}) %>
                         </div>
                     </article>

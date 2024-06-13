@@ -1,22 +1,65 @@
-const getDb = require('../util/db').getDb;
+const getDb = require("../util/db").getDb;
+const mongodb = require('mongodb');
 
 class Product {
-  constructor(title, price, description, imageUrl){
+  constructor(title, price, description, imageUrl,id) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
+    this._id = new mongodb.ObjectId(id);
   }
 
-  save(){
+  save() {
     const db = getDb();
-    return db.collection('products').insertOne(this)
-    .then(result => {
-      console.log(result);
+    let dbOp;
+    if (this._id) {
+        dbOp = db
+            .collection('products')
+            .updateOne(
+                { _id: this._id },
+                { $set: this }
+            );
+    } else {
+        dbOp = db.collection('products').insertOne(this);
+    }
+    return dbOp
+        .then((result) => {
+            console.log(result);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+}
+
+
+static findById(prodId){
+  const db = getDb();
+  // In MongoDb the id is stored as a New datatype called as ObjectId. 
+  // SO in the below statement we ca'nt compare _id with a string ie prodId.
+  // So we need to convert prodId to that format ie ObjectId 
+  //    /***  IMPORTANT */
+  // findOne() returns the document itself not the cursor object like find()
+  // so we need not convert it to an array . 
+  return db.collection('products').findOne({_id : new mongodb.ObjectId(prodId)})
+  .then(product => {
+    console.log(product);
+    return product;
+  })
+  .catch(err => console.log(err))
+}
+
+  static fetchAll() {
+    // To connect to db instance
+    const db = getDb();
+    // .find() returns a cursor object to the resultant query. In order to access it, convert it to an array or some callback.
+    return db.collection("products").find().toArray()
+    .then(products => {
+      return products;
     })
     .catch(err => console.log(err))
   }
 
-}
+};
 
 module.exports = Product;
