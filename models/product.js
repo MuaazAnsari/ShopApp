@@ -7,7 +7,9 @@ class Product {
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
-    this._id = new mongodb.ObjectId(id);
+    // You need a check wether the id is defined  or is null. 
+    // 
+    this._id = id ? new mongodb.ObjectId(id) : null;
   }
 
   save() {
@@ -45,6 +47,15 @@ static findById(prodId){
   .then(product => {
     console.log(product);
     return product;
+  })
+  .catch(err => console.log(err))
+}
+
+static deleteById(prodId) {
+  const db = getDb();
+  return db.collection('products').deleteOne({_id : new mongodb.ObjectId(prodId)})
+  .then(() => {
+    console.log('DELETED PRODUCT');
   })
   .catch(err => console.log(err))
 }
