@@ -2,14 +2,16 @@ const getDb = require("../util/db").getDb;
 const mongodb = require('mongodb');
 
 class Product {
-  constructor(title, price, description, imageUrl,id) {
+  constructor(title, price, description, imageUrl,id, userId) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
     // You need a check wether the id is defined  or is null. 
-    // 
+    //  Before ternary operator, we were always creating an id and passing it, even though it was null.
+    // WHich in save() function was for update.
     this._id = id ? new mongodb.ObjectId(id) : null;
+    this.userId = userId;
   }
 
   save() {
