@@ -47,34 +47,36 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  req.user
-    .getCart()
-    .then((cart) => {
-      cart
-        .getProducts()
-        .then((products) => {
-          res.render("shop/cart", {
-            pageTitle: "My Cart",
-            path: "/cart",
-            cartProducts: products,
-          });
-        })
-        .catch((err) => console.log(err));
-    })
-    .catch((err) => console.log(err));
+  req.user.getCart().then((products) => {
+    res.render("shop/cart", {
+      pageTitle: "My Cart",
+      path: "/cart",
+      cartProducts: products,
+    });
+  });
+
+  // req.user.getCart()
+  //       .then((products) => {
+  //         res.render("shop/cart", {
+  //           pageTitle: "My Cart",
+  //           path: "/cart",
+  //           cartProducts: products,
+  //         });
+  //       })
+  //       .catch((err) => console.log(err));
 };
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
-  .then(product => {
-    return req.user.addToCart(product);
-  })
-  .then(result => {
-    // console.log(result);
-    res.redirect("/cart");
-  })
-  .catch(err => console.log(err))
+    .then((product) => {
+      return req.user.addToCart(product);
+    })
+    .then((result) => {
+      // console.log(result);
+      res.redirect("/cart");
+    })
+    .catch((err) => console.log(err));
   // let fetchedCart;
   // let newQuantity = 1;
 
@@ -114,19 +116,7 @@ exports.postCart = (req, res, next) => {
 exports.deleteProductCart = (req, res, next) => {
   const prodId = req.body.productId;
   req.user
-    .getCart()
-    .then((cart) => {
-      return cart.getProducts({ where: { id: prodId } });
-    })
-    .then((products) => {
-      let product = products[0];
-      return product;
-    })
-    .then((product) => {
-      // This removes product object from cart only not from the database
-      return product.cartItem.destroy();
-    })
-
+    .deleteFromCart(prodId)
     .then(() => {
       console.log("DELETED PRODUCT");
       res.redirect("/cart");
@@ -135,16 +125,17 @@ exports.deleteProductCart = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  req.user.getOrders({include : ['products']})
-  .then(orders => {
-    console.log(orders);
-    res.render("shop/orders", {
-      pageTitle: "My Orders",
-      path: "/orders",
-      orders: orders,
-    });
-  })
-  .catch(err => console.log(err))
+  req.user
+    .getOrders({ include: ["products"] })
+    .then((orders) => {
+      console.log(orders);
+      res.render("shop/orders", {
+        pageTitle: "My Orders",
+        path: "/orders",
+        orders: orders,
+      });
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.postOrders = (req, res, next) => {
