@@ -6,11 +6,11 @@
         <main>
             <% if(orders.length > 0) { %>
                     <ul>
-                        <% for (order of orders) {%>
-                            <h1> #<%= order.id %></h1>
-                            <% for (product of order.products) {%>
+                        <% for(order of orders) { %>
+                            <h1> #<%= order._id %></h1>
+                            <% for (product of order.items) {%>
                                 <li>
-                                    <%= product.title %> (<%= product.orderItem.quantity %>)
+                                    <%= product.title %> (<%= product.quantity %>)
                                 </li>
                             <% } %>
                         <% } %>

@@ -1,7 +1,7 @@
 const Product = require("../models/product");
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/index", {
         prods: products,
@@ -16,7 +16,7 @@ exports.getIndex = (req, res, next) => {
 
 // Taken From shop.js File
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/product-list", {
         prods: products,
@@ -124,45 +124,22 @@ exports.deleteProductCart = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.getOrders = (req, res, next) => {
-  req.user
-    .getOrders({ include: ["products"] })
-    .then((orders) => {
-      console.log(orders);
-      res.render("shop/orders", {
-        pageTitle: "My Orders",
-        path: "/orders",
-        orders: orders,
-      });
-    })
-    .catch((err) => console.log(err));
+exports.getOrders = async (req, res, next) => {
+  try {
+    const orders = await req.user.getOrders();
+    console.log(orders);
+    res.render("shop/orders", {
+      pageTitle: "My Orders",
+      path: "/orders",
+      orders: orders,
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-exports.postOrders = (req, res, next) => {
-  let fetchedCart;
-  req.user
-    .getCart()
-    .then((cart) => {
-      fetchedCart = cart;
-      return cart.getProducts();
-    })
-    .then((products) => {
-      return req.user
-        .createOrder()
-        .then((order) => {
-          order.addProducts(
-            products.map((product) => {
-              product.orderItem = { quantity: product.cartItem.quantity };
-              return product;
-            })
-          );
-        })
-        .catch((err) => console.log(err));
-    })
-    .then(() => {
-      // we are emptying the cart after adding the elements in the order.
-      return fetchedCart.setProducts(null);
-    })
+exports.postOrders = async (req, res, next) => {
+  req.user.addOrder()
     .then((result) => {
       res.redirect("/orders");
     })

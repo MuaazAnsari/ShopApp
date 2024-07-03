@@ -84,6 +84,36 @@ class User {
       );
   }
 
+  addOrder() {
+    const db = getDb();
+    // We need to have product details as well as user information in orders. So we embed documents.
+    return this.getCart().then(products => {
+      const order = {
+        // products contains cart products , there details and quantity.
+        items : products,
+        user : {
+          _id : new mongodb.ObjectId(this._id),
+          name : this.name
+        }
+      }
+      return db.collection('orders').insertOne(order)   
+    })
+    .then(result => {
+      this.cart = {items:[]};
+    return db
+      .collection("users")
+      .updateOne(
+        { _id: new mongodb.ObjectId(this._id) },
+        { $set: { cart: {items : []} } }
+      );
+    });
+  }
+
+  getOrders() {
+    const db = getDb();
+    return db.collection('orders').find({'user._id' : new mongodb.ObjectId(this._id)}).toArray();
+  }
+
   static findById(userId) {
     const db = getDb();
     return db
