@@ -56,43 +56,37 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const id = req.body.productId;
-  console.log(id);
   const updatedTitle = req.body.title;
   const updatedImageUrl = req.body.imageUrl;
   const updatedDescription = req.body.description;
   const updatedPrice = req.body.price;
-  const product = new Product(
-    updatedTitle,
-    updatedPrice,
-    updatedDescription,
-    updatedImageUrl,
-    id
-  );
-  // The return product.save(); statement ensures that the next .then() block will only execute after the save Promise resolves.
-  //The return statement within the .then block controls the flow of asynchronous operations.
-  // Code execution waits for the save operation to complete before moving on to the next .then block.
-  product
-    .save()
-    .then((result) => {
-      console.log("UPDATED");
-      // This redirects only when the product data is updated.
-      res.redirect("/admin/products");
-    })
-    .catch((err) => console.log(err));
+  Product.findByIdAndUpdate(id, {
+    title : updatedTitle,
+    price : updatedPrice,
+    description : updatedDescription,
+    imageUrl : updatedImageUrl,
+  }, {new : true})
+  .then((result) => {
+        console.log("UPDATED");
+        // This redirects only when the product data is updated.
+        res.redirect("/admin/products");
+      })
+  .catch((err) => console.log(err));
+
 };
 
 exports.deleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId)
+  Product.findByIdAndDelete(prodId)
     .then((result) => {
-      // console.log(result);
+      console.log("DELETED SUCCESSFULLY!");
       res.redirect("/admin/products");
     })
     .catch((err) => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("admin/products", {
         prods: products,

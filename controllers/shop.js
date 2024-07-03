@@ -1,6 +1,7 @@
 const Product = require("../models/product");
 
 exports.getIndex = (req, res, next) => {
+  // Mongoose provides find method inbuilt
   Product.find()
     .then((products) => {
       res.render("shop/index", {
@@ -16,6 +17,7 @@ exports.getIndex = (req, res, next) => {
 
 // Taken From shop.js File
 exports.getProducts = (req, res, next) => {
+  // Mongoose provides find method inbuilt
   Product.find()
     .then((products) => {
       res.render("shop/product-list", {
@@ -33,7 +35,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  //utilising the function provided by sequelize
+  // Mongoose provides findById method inbuilt
   Product.findById(prodId)
     .then((product) => {
       // console.log(product);
