@@ -1,5 +1,7 @@
 const Product = require("../models/product");
 
+// PRODUCTS SECTION
+
 exports.getIndex = (req, res, next) => {
   // Mongoose provides find method inbuilt
   Product.find()
@@ -48,24 +50,31 @@ exports.getProduct = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.getCart = (req, res, next) => {
-  req.user.getCart().then((products) => {
+// CART SECTION
+
+exports.getCart = async (req, res, next) => {
+  try {
+    // Populate the product details in the cart items and await completion
+    await req.user.populate('cart.items.productId');
+
+    // Access the populated cart items
+    const cartProducts = req.user.cart.items.map(item => {
+      return {
+        product: item.productId, // This will be the populated product document
+        quantity: item.quantity
+      };
+    });
+    // console.log(cartProducts);
     res.render("shop/cart", {
       pageTitle: "My Cart",
       path: "/cart",
-      cartProducts: products,
+      cartProducts: cartProducts
     });
-  });
-
-  // req.user.getCart()
-  //       .then((products) => {
-  //         res.render("shop/cart", {
-  //           pageTitle: "My Cart",
-  //           path: "/cart",
-  //           cartProducts: products,
-  //         });
-  //       })
-  //       .catch((err) => console.log(err));
+  }
+  catch(err){
+    console.log(err);
+    next(err);
+  }
 };
 
 exports.postCart = (req, res, next) => {
@@ -75,44 +84,9 @@ exports.postCart = (req, res, next) => {
       return req.user.addToCart(product);
     })
     .then((result) => {
-      // console.log(result);
       res.redirect("/cart");
     })
     .catch((err) => console.log(err));
-  // let fetchedCart;
-  // let newQuantity = 1;
-
-  // // getting a cart for a user
-  // req.user
-  //   .getCart()
-  //   .then((cart) => {
-  //     fetchedCart = cart;
-  //     return cart.getProducts({ where: { id: prodId } });
-  //   })
-  //   .then((products) => {
-  //     let product;
-  //     if (products.length > 0) {
-  //       product = products[0];
-  //     }
-
-  //     if (product) {
-  //       //.. if product exists in cart
-  //       const oldQuantity = product.cartItem.quantity;
-  //       newQuantity = oldQuantity + 1;
-  //       return product;
-  //     }
-  //     //else
-  //     return Product.findByPk(prodId);
-  //   })
-  //   .then((product) => {
-  //     return fetchedCart.addProduct(product, {
-  //       through: { quantity: newQuantity },
-  //     });
-  //   })
-  //   .then(() => {
-  //     res.redirect("/cart");
-  //   })
-  //   .catch((err) => console.log(err));
 };
 
 exports.deleteProductCart = (req, res, next) => {
@@ -125,6 +99,8 @@ exports.deleteProductCart = (req, res, next) => {
     })
     .catch((err) => console.log(err));
 };
+
+// ORDERS SECTION
 
 exports.getOrders = async (req, res, next) => {
   try {
@@ -141,7 +117,8 @@ exports.getOrders = async (req, res, next) => {
 };
 
 exports.postOrders = async (req, res, next) => {
-  req.user.addOrder()
+  req.user
+    .addOrder()
     .then((result) => {
       res.redirect("/orders");
     })

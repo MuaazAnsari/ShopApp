@@ -20,7 +20,8 @@ exports.postAddProduct = (req, res, next) => {
     title: title,
     price : price,
     description : description,
-    imageUrl : imageUrl
+    imageUrl : imageUrl,
+    userId : req.user._id
   });
   product
     .save()
@@ -87,6 +88,11 @@ exports.deleteProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+            // using select, we can select and limit the data we are getting from database.
+            // In this case, we want title and price, do not want _id
+    // .select('title price -_id')
+          // Using populate , we can get the entire user object from the userId
+    // .populate('userId')
     .then((products) => {
       res.render("admin/products", {
         prods: products,

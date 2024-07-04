@@ -23,7 +23,7 @@ app.use((req,res,next) =>{
         // Here the user we get will just be a user data fetched from database. 
         // We cant apply any methods on that as it is not an instance.
         // so we create a user instance and then store it in req.user
-        req.user = new User(user.name, user.email, user.cart, user._id);
+        req.user = user;
         next();
     })
     .catch(err => console.log(err))
