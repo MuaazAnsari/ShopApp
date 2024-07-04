@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const Order = require("../models/order");
 
 // PRODUCTS SECTION
 
@@ -104,8 +105,7 @@ exports.deleteProductCart = (req, res, next) => {
 
 exports.getOrders = async (req, res, next) => {
   try {
-    const orders = await req.user.getOrders();
-    console.log(orders);
+    const orders = await Order.find({'user.userId': req.user._id});
     res.render("shop/orders", {
       pageTitle: "My Orders",
       path: "/orders",
@@ -117,10 +117,33 @@ exports.getOrders = async (req, res, next) => {
 };
 
 exports.postOrders = async (req, res, next) => {
-  req.user
-    .addOrder()
-    .then((result) => {
+  try {
+        await req.user.populate('cart.items.productId');
+
+        // Get cartProducts with fully populated product details
+        const cartProducts = req.user.cart.items.map(item => ({
+          product: { ...item.productId._doc },
+          quantity: item.quantity
+        }));
+
+        // console.log(cartProducts);
+      const order = new Order({
+        user : {
+          name : req.user.name,
+          userId : req.user._id
+        },
+        products: cartProducts
+      });
+
+      await order.save();
+
+      // clear Cart
+      await req.user.clearCart();
+
       res.redirect("/orders");
-    })
-    .catch((err) => console.log(err));
+   } catch(err) {
+        console.log(err);
+        next(err);
+   }
+
 };

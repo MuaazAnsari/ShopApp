@@ -8,9 +8,9 @@
                     <ul>
                         <% for(order of orders) { %>
                             <h1> #<%= order._id %></h1>
-                            <% for (product of order.items) {%>
+                            <% for (p of order.products) {%>
                                 <li>
-                                    <%= product.title %> (<%= product.quantity %>)
+                                    <%= p.product.title %> (<%= p.quantity %>)
                                 </li>
                             <% } %>
                         <% } %>
